@@ -13,6 +13,7 @@ const Login: React.FC = () => {
     e.preventDefault();
       const { error } = await supabase.auth.signInWithPassword({email, password});
       if (error) {
+        setError(error.message);
         throw error;
       }
       router.push("/profile");

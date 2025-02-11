@@ -10,12 +10,12 @@ export async function uploadImage(
     }
   | {
       data: null;
-      error: any;
+      error: unknown;
     }
 > {
  const randomString = Math.random().toString(36).substring(2, 15);
   const fileName = `${Date.now()}_${randomString}.${file.name.split(".").pop()}`;
-  const { data, error } = await supabase.storage
+  const {error } = await supabase.storage
     .from(bucket)
     .upload(fileName, file);
 
@@ -41,10 +41,10 @@ export async function deleteImage(
     }
   | {
       data: null;
-      error: any;
+      error: unknown;
     } 
 > {
-  const { data, error } = await supabase.storage
+  const {error } = await supabase.storage
     .from(bucket)
     .remove([fileName]);
 

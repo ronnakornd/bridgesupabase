@@ -1,13 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import {
-  fetchCourseById,
   fetchChaptersByCourseId,
   fetchLessonsByChapterId,
 } from "@/api/courses";
 import { Chapter, Lesson } from "@/types/course";
 import LessonEditor from "./LessonEditor";
-import { li, ul } from "framer-motion/m";
+
 
 interface LessonContentProps {
   courseId: string;

@@ -1,38 +1,27 @@
 "use client";
 import React, { useState, useEffect, memo } from "react";
 import { Chapter, Lesson } from "@/types/course";
-import { v4 as uuidv4 } from "uuid";
-import { useParams } from "next/navigation";
 import ReorderGroup from "./reorder/ReorderGroup";
-import { supabase } from "@/libs/supabase/client";
 import {
   addLesson,
-  fetchChaptersByCourseId,
   fetchLessonsByChapterId,
   deleteLesson,
   updateLesson,
 } from "@/api/courses";
-import MuxVideoUploader from "./video/Uploader";
-import { data, div, use } from "framer-motion/m";
-import MuxVideoPlayer from "./video/Player";
 
 interface LessonManagerProps {
   selectedChapter: Chapter | null;
-  onLessonSelect: (lesson: Lesson | null) => void;
 }
 
 const LessonManager: React.FC<LessonManagerProps> = ({
   selectedChapter,
-  onLessonSelect,
 }) => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [newLessonTitle, setNewLessonTitle] = useState("");
   const [editLessonTitle, setEditLessonTitle] = useState("");
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
+  
   const chapterId = selectedChapter?.id;
-  const [videoPlaybackId, setVideoPlaybackId] = useState<string | null>(null);
-  const [videoUploadId, setVideoUploadId] = useState<string | null>(null);
-  const [assetId, setAssetId] = useState<string | null>(null);
 
   const fetchLessons = async () => {
     if (!chapterId) {
@@ -79,7 +68,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
 
     // Clear the input fields
     setNewLessonTitle("");
-    document.getElementById("add_lesson_modal")?.close();
+    (document.getElementById("add_lesson_modal") as HTMLDialogElement)?.close();
   };
 
   const handleEditLesson = (
@@ -91,7 +80,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
       return;
     }
 
-    let editedLesson = {
+    const editedLesson = {
       title: editLessonTitle,
     };
     updateLesson(selectedLesson.id, editedLesson).then(() => {
@@ -99,7 +88,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
     });
     // Clear the input fields
     setEditLessonTitle("");
-    document.getElementById("edit_lesson_modal")?.close();
+    (document.getElementById("edit_lesson_modal") as HTMLDialogElement)?.close();
   };
 
   const handleDeleteVideo = (
@@ -122,35 +111,15 @@ const LessonManager: React.FC<LessonManagerProps> = ({
         });
       }
     });
-    document.getElementById("delete_video_modal")?.close();
+    (document.getElementById("delete_video_modal") as HTMLDialogElement)?.close();
   };
 
   useEffect(() => {
     fetchLessons();
   }, [selectedChapter]);
 
-  useEffect(() => {
-    if (selectedLesson) {
-      onLessonSelect(selectedLesson);
-    }
-  }, [selectedLesson]);
 
-  useEffect(() => {
-    if (videoUploadId) {
-      fetch("/api/mux/getAssetId/" + videoUploadId)
-        .then(async (response) => {
-          const data = await response.json();
-          return data;
-        })
-        .then((data) => {
-          setAssetId(data.asset_id);
-          setVideoPlaybackId(data.playback_id);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
-  }, [videoUploadId]);
+
   
   if (!selectedChapter) {
     return (
@@ -181,8 +150,6 @@ const LessonManager: React.FC<LessonManagerProps> = ({
                   setSelectedLesson(
                     selectedLesson?.id === lesson.id ? null : lesson
                   );
-                  setAssetId(lesson.asset_id);
-                  setVideoPlaybackId(lesson.playback_id);
                   setEditLessonTitle(lesson.title);
                 }}
               >
@@ -193,10 +160,8 @@ const LessonManager: React.FC<LessonManagerProps> = ({
                       e.preventDefault();
                       e.stopPropagation();
                       setSelectedLesson(lesson);
-                      setAssetId(lesson.asset_id);
-                      setVideoPlaybackId(lesson.playback_id);
                       setEditLessonTitle(lesson.title);
-                      document.getElementById("edit_lesson_modal")?.showModal();
+                      (document.getElementById("edit_lesson_modal") as HTMLDialogElement)?.showModal();
                     }}
                   >
                     <svg
@@ -216,8 +181,8 @@ const LessonManager: React.FC<LessonManagerProps> = ({
                       e.preventDefault();
                       setSelectedLesson(lesson);
 
-                      document
-                        .getElementById("delete_lesson_modal")
+                      (document
+                        .getElementById("delete_lesson_modal") as HTMLDialogElement)
                         ?.showModal();
                     }}
                   >
@@ -242,7 +207,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
       <button
         onClick={(e) => {
           e.preventDefault();
-          document.getElementById("add_lesson_modal")?.showModal();
+          (document.getElementById("add_lesson_modal") as HTMLDialogElement)?.showModal();
         }}
         className="btn btn-ghost w-full mt-5"
       >
@@ -270,7 +235,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
               className="btn"
               onClick={(e) => {
                 e.preventDefault();
-                document.getElementById("add_lesson_modal")?.close();
+                (document.getElementById("add_lesson_modal") as HTMLDialogElement)?.close();
               }}
             >
               Close
@@ -300,7 +265,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
               className="btn"
               onClick={(e) => {
                 e.preventDefault();
-                document.getElementById("edit_lesson_modal")?.close();
+                (document.getElementById("edit_lesson_modal") as HTMLDialogElement)?.close();
               }}
             >
               Close
@@ -315,8 +280,8 @@ const LessonManager: React.FC<LessonManagerProps> = ({
           {selectedLesson && (
             <>
               <p className="py-4">
-                Are you sure you want to delete the lesson "
-                {selectedLesson.title}"?
+                Are you sure you want to delete the lesson &quot;
+                {selectedLesson.title} &quot;?
               </p>
               <div className="modal-action">
                 <button
@@ -326,7 +291,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
                     deleteLesson(selectedLesson.id).then(() => {
                       fetchLessons();
                     });
-                    document.getElementById("delete_lesson_modal")?.close();
+                    (document.getElementById("delete_lesson_modal") as HTMLDialogElement)?.close();
                   }}
                 >
                   Delete
@@ -335,7 +300,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
                   className="btn"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById("delete_lesson_modal")?.close();
+                    (document.getElementById("delete_lesson_modal") as HTMLDialogElement)?.close();
                   }}
                 >
                   Cancel
@@ -352,8 +317,8 @@ const LessonManager: React.FC<LessonManagerProps> = ({
           {selectedLesson && (
             <>
               <p className="py-4">
-                Are you sure you want to delete the current video of "
-                {selectedLesson.title}"?
+                Are you sure you want to delete the current video of &quot;
+                {selectedLesson.title}&quot;?
               </p>
               <div className="modal-action">
                 <button
@@ -368,7 +333,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
                   className="btn"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById("delete_lesson_modal")?.close();
+                    (document.getElementById("delete_lesson_modal") as HTMLDialogElement)?.close();
                   }}
                 >
                   Cancel

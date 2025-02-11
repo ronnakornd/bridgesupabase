@@ -45,7 +45,7 @@ export default function Register() {
     // Step 2: Upload profile image if provided
     if (profileImage) {
       const fileExtension = profileImage.name.split(".").pop();
-      const { data: storageData, error: storageError } = await supabase.storage
+      const { error: storageError } = await supabase.storage
         .from("profile-images")
         .upload(
           `public/${data.user?.id}/${data.user?.id}.${fileExtension}`,

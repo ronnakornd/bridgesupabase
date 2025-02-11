@@ -1,16 +1,13 @@
 "use client";
 import React, { useState, useEffect, memo } from "react";
 import { Chapter } from "@/types/course";
-import { v4 as uuidv4 } from "uuid";
 import { useParams } from "next/navigation";
 import ReorderGroup from "./reorder/ReorderGroup";
-import { supabase } from "@/libs/supabase/client";
 import {
   addChapter,
   fetchChaptersByCourseId,
   updateChapter,
   deleteChapter,
-  updateCourse,
 } from "@/api/courses";
 
 interface ChapterManagerProps {
@@ -20,7 +17,6 @@ interface ChapterManagerProps {
 const ChapterManager: React.FC<ChapterManagerProps> = ({
   onSelectedChapter,
 }) => {
-  const [chaptersIds, setChaptersIds] = useState<string[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [newChapterTitle, setNewChapterTitle] = useState("");
   const [editChapterTitle, setEditChapterTitle] = useState("");
@@ -69,7 +65,9 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({
 
     // Clear the input fields
     setNewChapterTitle("");
-    document.getElementById("add_chapter_modal")?.close();
+    (
+      document.getElementById("add_chapter_modal") as HTMLDialogElement
+    )?.close();
   };
 
   const handleEditChapter = (
@@ -89,7 +87,9 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({
 
     // Clear the input fields
     setEditChapterTitle("");
-    document.getElementById("edit_chapter_modal")?.close();
+    (
+      document.getElementById("edit_chapter_modal") as HTMLDialogElement
+    )?.close();
   };
 
   useEffect(() => {
@@ -126,7 +126,11 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({
                     e.stopPropagation();
                     setSelectedChapter(chapter);
                     setEditChapterTitle(chapter.title);
-                    document.getElementById("edit_chapter_modal")?.showModal();
+                    (
+                      document.getElementById(
+                        "edit_chapter_modal"
+                      ) as HTMLDialogElement
+                    )?.showModal();
                   }}
                 >
                   <svg
@@ -146,9 +150,11 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({
                     e.preventDefault();
                     e.stopPropagation();
                     setSelectedChapter(chapter);
-                    document
-                      .getElementById("delete_chapter_modal")
-                      ?.showModal();
+                    (
+                      document.getElementById(
+                        "delete_chapter_modal"
+                      ) as HTMLDialogElement
+                    )?.showModal();
                   }}
                 >
                   <svg
@@ -172,7 +178,7 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({
         onClick={(e) => {
           e.preventDefault();
 
-          document.getElementById("add_chapter_modal")?.showModal();
+          (document.getElementById("add_chapter_modal") as HTMLDialogElement)?.showModal();
         }}
         className="btn btn-ghost w-full mt-5"
       >
@@ -200,7 +206,7 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({
               className="btn"
               onClick={(e) => {
                 e.preventDefault();
-                document.getElementById("add_chapter_modal")?.close();
+                (document.getElementById("add_chapter_modal") as HTMLDialogElement)?.close();
               }}
             >
               Close
@@ -230,7 +236,7 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({
               className="btn"
               onClick={(e) => {
                 e.preventDefault();
-                document.getElementById("edit_chapter_modal")?.close();
+                (document.getElementById("edit_chapter_modal") as HTMLDialogElement)?.close();
               }}
             >
               Close
@@ -245,8 +251,8 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({
           {selectedChapter && (
             <>
               <p className="py-4">
-                Are you sure you want to delete the chapter "
-                {selectedChapter.title}"?
+                Are you sure you want to delete the chapter &quot;
+                {selectedChapter.title}&quot;?
               </p>
               <div className="modal-action">
                 <button
@@ -256,7 +262,11 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({
                     deleteChapter(selectedChapter.id).then(() => {
                       fetchChapters();
                     });
-                    document.getElementById("delete_chapter_modal")?.close();
+                    (
+                      document.getElementById(
+                        "delete_chapter_modal"
+                      ) as HTMLDialogElement
+                    )?.close();
                   }}
                 >
                   Delete
@@ -265,7 +275,7 @@ const ChapterManager: React.FC<ChapterManagerProps> = ({
                   className="btn"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById("delete_chapter_modal")?.close();
+                    (document.getElementById("delete_chapter_modal") as HTMLDialogElement)?.close();
                   }}
                 >
                   Cancel

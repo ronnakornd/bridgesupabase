@@ -3,12 +3,12 @@ import MuxUploader from "@mux/mux-uploader-react";
 import { useEffect, useState } from "react";
 
 interface MuxVideoUploaderProps {
-  onSuccess: (upload: any) => void;
+  onSuccess: (upload: string) => void;
   onUrlGenerated: (url: string) => void;
 }
 
 export default function MuxVideoUploader({ onSuccess, onUrlGenerated }: MuxVideoUploaderProps) {
-  const [directUpload, setDirectUpload] = useState<any | null>(null);
+  const [directUpload, setDirectUpload] = useState<{url: string, id: string} | null>(null);
   const [directUploadUrl, setDirectUploadUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function MuxVideoUploader({ onSuccess, onUrlGenerated }: MuxVideo
     directUpload && (
       <MuxUploader
         endpoint={directUploadUrl}
-        onSuccess={(upload) => {
+        onSuccess={() => {
           onSuccess(directUpload.id);
           console.log("Upload complete:", directUpload.id);
         }}

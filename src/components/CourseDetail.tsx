@@ -1,5 +1,5 @@
 import React from 'react';
-import { Course, Chapter } from '@/types/course';
+import { Course } from '@/types/course';
 
 interface CourseDetailProps {
 
@@ -37,13 +37,7 @@ const CourseDetail: React.FC<CourseDetailProps> = ({course}) => {
             <div className='card-body'>
                 <h2 className="text-2xl font-bold mb-2">Course Chapters</h2>
                 <ul className="list-disc pl-5">
-                    {course.chapters && course.chapters.length > 0 && course.chapters.map(chapter => (
-                        <li key={chapter.id} className="mb-2">
-                            <div className="flex justify-between">
-                                <span>{chapter.title}</span>
-                            </div>
-                        </li>
-                    ))}
+                  
                 </ul>
                 </div>
             </div>

@@ -1,6 +1,5 @@
 import React from "react";
 import CourseDetail from "@/components/CourseDetail";
-import { Course } from "@/types/course";
 import { fetchCourseById } from '@/api/courses';
 
 

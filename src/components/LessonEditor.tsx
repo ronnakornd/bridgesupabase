@@ -28,7 +28,7 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
       console.error("No lesson selected");
       return;
     }
-    let editedLesson = {
+    const editedLesson = {
       title: editLessonTitle,
       asset_id: assetId,
       playback_id: videoPlaybackId,
@@ -58,7 +58,7 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
         });
       }
     });
-    document.getElementById("delete_video_modal")?.close();
+    (document.getElementById("delete_video_modal") as HTMLDialogElement)?.close();
   };
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
         .then((data) => {
           setAssetId(data.asset_id);
           setVideoPlaybackId(data.playback_id);
-          let editedLesson = {
+          const editedLesson = {
             asset_id: data.asset_id,
             playback_id: data.playback_id,
           };
@@ -123,7 +123,7 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
                 <div
                   className="btn btn-neutral mt-4"
                   onClick={() =>
-                    document.getElementById("delete_video_modal")?.show()
+                    (document.getElementById("delete_video_modal") as HTMLDialogElement)?.show()
                   }
                 >
                   upload new video
@@ -153,6 +153,7 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
                     type: file.type,
                     file,
                   }));
+                  console.log({ attachments });
                 }
               }}
             />
@@ -171,8 +172,8 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
           {selectedLesson && (
             <>
               <p className="py-4">
-                Are you sure you want to delete the lesson "
-                {selectedLesson.title}"?
+                Are you sure you want to delete the lesson &quot;
+                {selectedLesson.title}&quot;?
               </p>
               <div className="modal-action">
                 <button
@@ -182,7 +183,7 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
                     deleteLesson(selectedLesson.id).then(() => {
                       fetchLessons();
                     });
-                    document.getElementById("delete_lesson_modal")?.close();
+                    (document.getElementById("delete_lesson_modal") as HTMLDialogElement)?.close();
                   }}
                 >
                   Delete
@@ -191,7 +192,7 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
                   className="btn"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById("delete_lesson_modal")?.close();
+                    (document.getElementById("delete_lesson_modal") as HTMLDialogElement)?.close();
                   }}
                 >
                   Cancel
@@ -208,8 +209,8 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
           {selectedLesson && (
             <>
               <p className="py-4">
-                Are you sure you want to delete the current video of "
-                {selectedLesson.title}"?
+                Are you sure you want to delete the current video of &quot;
+                {selectedLesson.title}&quot;?
               </p>
               <div className="modal-action">
                 <button
@@ -224,7 +225,7 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
                   className="btn"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById("delete_lesson_modal")?.close();
+                    (document.getElementById("delete_lesson_modal") as HTMLDialogElement)?.close();
                   }}
                 >
                   Cancel

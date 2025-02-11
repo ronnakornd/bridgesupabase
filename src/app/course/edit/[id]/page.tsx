@@ -1,12 +1,11 @@
 "use client";
-import React, { useState, useEffect, memo } from "react";
-import { useRouter, useParams } from "next/navigation";
+import React, { useState, useEffect} from "react";
+import {useParams } from "next/navigation";
 import { fetchCourseById, updateCourse } from "@/api/courses";
 import { uploadImage, deleteImage } from "@/api/images";
-import { Course, Lesson, Chapter } from "@/types/course";
+import { Course, Chapter } from "@/types/course";
 import ChapterManager from "@/components/ChapterManager";
 import LessonManager from "@/components/LessonManager";
-import LessonEditor from "@/components/LessonEditor";
 import LessonContent from "@/components/LessonContent";
 import Breadcrump from "@/components/Breadcrump";
 import CourseEditor from "@/components/CourseEditor";
@@ -29,7 +28,6 @@ const EditCourse: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [coverImgFile, setCoverImgFile] = useState<File | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
-  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [tab, setTab] = useState(0);
 
   useEffect(() => {
@@ -160,7 +158,6 @@ const EditCourse: React.FC = () => {
               <ChapterManager onSelectedChapter={setSelectedChapter} />
               <LessonManager
                 selectedChapter={selectedChapter}
-                onLessonSelect={setSelectedLesson}
               />
             </div>
           )}

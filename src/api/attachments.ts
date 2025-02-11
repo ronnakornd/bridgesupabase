@@ -11,7 +11,7 @@ export async function uploadAttachment(
         }
     | {
             data: null;
-            error: any;
+            error: unknown;
         }
 > {
         const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
@@ -21,7 +21,7 @@ export async function uploadAttachment(
 
         const randomString = Math.random().toString(36).substring(2, 15);
         const fileName = `${Date.now()}_${randomString}.${file.name.split(".").pop()}`;
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
                 .from(bucket)
                 .upload(fileName, file);
         

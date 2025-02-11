@@ -3,17 +3,16 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/libs/supabase/client";
 import { User } from "@/types/user";
 import { useRouter } from "next/navigation";
-import ProtectedRoute from "@/components/ProtectedRoute";
 
 const Profile: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState<String>("");
-  const [isEditing, setIsEditing] = useState<Boolean>(false);
+  const [email, setEmail] = useState<string>("");
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [purchaseHistory, setPurchaseHistory] = useState([]);
-  const [profileImage, setProfileImage] = useState<String>("");
-  const [profileImagePreview, setProfileImagePreview] = useState<String | null>(
+  const [profileImage, setProfileImage] = useState<string>("");
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
     null
   );
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
@@ -42,6 +41,7 @@ const Profile: React.FC = () => {
         setProfileImagePreview(data.profile_image);
         setEmail(user.data.user?.email || "");
         setIsLoaded(true);
+        setPurchaseHistory(data.purchase_history || []);
       }
       if (error) {
         console.log("Error fetching user profile:", error);
@@ -65,7 +65,7 @@ const Profile: React.FC = () => {
         return `${randomString}.${extension}`;
       };
       const randomFilename = generateRandomFilename(fileExtension || "");
-      const { data: storageData, error: storageError } = await supabase.storage
+      const { error: storageError } = await supabase.storage
         .from("profile-images")
         .upload(
           `public/${(await user).data.user?.id}/${randomFilename}`,
@@ -83,7 +83,7 @@ const Profile: React.FC = () => {
       profileImageURL = publicUrlData?.publicUrl;
     }
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("users")
       .update({
         first_name: firstName,
@@ -141,7 +141,7 @@ const Profile: React.FC = () => {
                 <label className="block mb-2">Profile Image</label>
 
                 <img
-                  src={profileImagePreview}
+                  src={profileImagePreview??""}
                   alt="Profile Preview"
                   className="w-60 h-60 object-cover rounded-full border bg-slate-200 mb-5"
                 />

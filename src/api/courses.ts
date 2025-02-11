@@ -1,5 +1,6 @@
 import { supabase } from '@/libs/supabase/client';
 import { Course, Chapter, Lesson } from '@/types/course';
+import { PostgrestError } from '@supabase/supabase-js';
 
 // Fetch all courses
 export const fetchCourses = async (): Promise<Course[]> => {
@@ -30,7 +31,7 @@ export const fetchCourseById = async (id: string): Promise<Course | null> => {
 };
 
 // Add a new course
-export const addCourse = async (course: Omit<Course, 'id' | 'created_at' | 'updated_at'>): Promise<any> => {
+export const addCourse = async (course: Omit<Course, 'id' | 'created_at' | 'updated_at'>): Promise<{data: Course, error: PostgrestError|null}> => {
     const {data, error } = await supabase
         .from('courses')
         .insert([
@@ -89,7 +90,7 @@ export const fetchChapters = async (courseId: string): Promise<Chapter[]> => {
 };
 
 // Add a new chapter
-export const addChapter = async (chapter: Omit<Chapter, 'id' | 'created_at' | 'updated_at'>): Promise<any> => {
+export const addChapter = async (chapter: Omit<Chapter, 'id' | 'created_at' | 'updated_at'>): Promise<Chapter> => {
     const { data, error } = await supabase
         .from('chapters')
         .insert([
@@ -147,7 +148,7 @@ export const fetchLessons = async (chapterId: string): Promise<Lesson[]> => {
 };
 
 // Add a new lesson
-export const addLesson = async (lesson: Omit<Lesson, 'id' | 'created_at' | 'updated_at'>): Promise<any> => {
+export const addLesson = async (lesson: Omit<Lesson, 'id' | 'created_at' | 'updated_at'>): Promise<Lesson> => {
     const { data, error } = await supabase
         .from('lessons')
         .insert([

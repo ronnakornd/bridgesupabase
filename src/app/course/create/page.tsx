@@ -4,7 +4,6 @@ import { addCourse } from "@/api/courses";
 import { Course } from "@/types/course";
 import { fetchProfile } from "@/api/users";
 import { uploadImage } from "@/api/images";
-import { supabase } from "@/libs/supabase/client";
 
 const CreateCourse: React.FC = () => {
   const [title, setTitle] = useState("");
@@ -50,12 +49,12 @@ const CreateCourse: React.FC = () => {
       chapters: [],
     };
     try {
-      let data = await addCourse(newCourse);
+      const {data} = await addCourse(newCourse);
       alert("Course created successfully");
       console.log(data);
       window.location.href = "/course/" + data.id;
     } catch (error) {
-      alert("Failed to create course");
+      alert("Failed to create course"+error);
     }
   };
 
@@ -164,6 +163,12 @@ const CreateCourse: React.FC = () => {
         </div>
         <div>
           <label className="block mb-2 font-bold text-xl">Cover Image</label>
+          <p>Recommended size: 800x600</p>
+          <img
+            src={cover ? cover : ""}
+            alt="cover"
+            className="w-1/4 h-1/4 object-cover rounded-md mb-3"
+          />
           <input
             type="file"
             className="file-input file-input-bordered w-full"

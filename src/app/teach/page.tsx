@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { fetchCourses, deleteCourse } from "@/api/courses";
 import { Course } from "@/types/course";
 import BadgeLevel from "@/components/BadgeLevel";
+import Link from "next/link";
 
 function Teach() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -54,9 +55,9 @@ function Teach() {
           <h1 className="text-3xl font-opunbold mb-3">My courses</h1>
           <p className="mb-5">Here you can create and manage your courses</p>
         </div>
-        <a className="btn btn-neutral" href="/course/create">
+        <Link className="btn btn-neutral" href="/course/create">
           Create new course
-        </a>
+        </Link>
       </div>
       <div>
         <div className="flex flex-col  justify-between mb-4">
@@ -160,8 +161,8 @@ function Teach() {
           {selectedCourse && (
             <>
               <p className="py-4">
-                Are you sure you want to delete the course "
-                {selectedCourse.title}"?
+                Are you sure you want to delete the course &quot;
+                {selectedCourse.title} &quot;?
               </p>
               <div className="modal-action">
                 <button

@@ -43,7 +43,6 @@ const CourseEditor: React.FC<CourseEditorProps> = ({
   price,
   setPrice,
   cover,
-  coverImgFile,
   setCoverImgFile,
   tags,
   setTags,
