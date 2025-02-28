@@ -1,4 +1,6 @@
-import { supabase } from "@/libs/supabase/client";
+import { createClient } from "@/libs/supabase/client";
+
+const supabase = createClient();
 
 export async function uploadImage(
   file: File,

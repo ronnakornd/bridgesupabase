@@ -1,23 +1,31 @@
 "use client";
 
-import MuxPlayer from "@mux/mux-player-react";
-
-interface MuxVideoPlayerProps {
-  playbackId: string;
+import { useState, useEffect } from "react";
+import { Video } from "@/types/video";
+interface videoViewerProps {
+  video_id: string;
 }
 
-const MuxVideoPlayer = ({ playbackId }: MuxVideoPlayerProps) => {
+export default function VideoViewer({ video_id}: videoViewerProps) {
+  const [video, setVideo] = useState<Video | null>(null);
+
+  useEffect(() => {
+    if (!video_id) return;
+    fetchVideo();
+  }, []);
+
+  const fetchVideo = async () => {
+    const response = await fetch(`/api/videos/${video_id}`);
+    const data = await response.json();
+    setVideo(data);
+  };
+
+
+  if (!video) return <div>Loading...</div>;
+
   return (
-    <div className="flex justify-center items-center">
-      <MuxPlayer
-        playbackId={playbackId}
-        autoPlay={false}
-        muted={false}
-        loop={false}
-        style={{ width: "100%", maxWidth: "800px", borderRadius: "10px" }}
-      />
+    <div className="w-full">
+      <video src={video.url} className="w-full mb-4" controls/>
     </div>
   );
-};
-
-export default MuxVideoPlayer;
+}

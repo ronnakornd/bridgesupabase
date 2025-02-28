@@ -1,36 +1,87 @@
 "use client";
-import MuxUploader from "@mux/mux-uploader-react";
-import { useEffect, useState } from "react";
 
-interface MuxVideoUploaderProps {
-  onSuccess: (upload: string) => void;
-  onUrlGenerated: (url: string) => void;
+import { useState, useEffect} from "react";
+import { User } from "@/types/user";
+import { fetchProfile } from "@/api/users";
+import { updateLesson } from "@/api/courses";
+
+interface UploadVideoProps {
+  lesson_id: string;
+  course_id: string;
+  fetchLessons: () => void;
 }
 
-export default function MuxVideoUploader({ onSuccess, onUrlGenerated }: MuxVideoUploaderProps) {
-  const [directUpload, setDirectUpload] = useState<{url: string, id: string} | null>(null);
-  const [directUploadUrl, setDirectUploadUrl] = useState<string | null>(null);
+export default function UploadVideo({
+  lesson_id,
+  course_id,
+  fetchLessons,
+}: UploadVideoProps) {
+  const [video, setVideo] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!video) return;
+
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("video", video);
+    formData.append("lesson_id", lesson_id || "");
+    formData.append("course_id", course_id || "");
+    formData.append("user_id", user?.id || "");
+
+    try {
+      const response = await fetch("/api/videos", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const videoData = await response.json();
+        const updatedLesson = {
+          video_id: videoData.id,
+        };
+        if (lesson_id) {
+          await updateLesson(lesson_id, updatedLesson);
+          fetchLessons();
+        }
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const getDirectUpload = async () => {
-      const response = await fetch("/api/mux");
-      const data = await response.json();
-      setDirectUpload(data);
-      setDirectUploadUrl(data.url);
-      onUrlGenerated(data.url);
+    const getProfile = async () => {
+      const profile = await fetchProfile();
+      setUser(profile);
     };
-    getDirectUpload();
+    getProfile();
   }, []);
 
   return (
-    directUpload && (
-      <MuxUploader
-        endpoint={directUploadUrl}
-        onSuccess={() => {
-          onSuccess(directUpload.id);
-          console.log("Upload complete:", directUpload.id);
-        }}
-      />
-    )
+    <div className="container">
+      <form onSubmit={handleSubmit} className="max-w-lg">
+        <div className="mb-4">
+          <input
+            type="file"
+            accept="video/*"
+            onChange={(e) => setVideo(e.target.files?.[0] || null)}
+            className="w-full file-input file-input-bordered"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn btn-outline w-full disabled:bg-blue-300"
+        >
+          {loading ? "Uploading..." : "Upload"}
+        </button>
+      </form>
+    </div>
   );
 }

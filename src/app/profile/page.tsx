@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { supabase } from "@/libs/supabase/client";
+import { createClient } from "@/libs/supabase/client";
 import { User } from "@/types/user";
 import { useRouter } from "next/navigation";
 
@@ -20,6 +20,7 @@ const Profile: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
   const [isLoaded, setIsLoaded] = useState(false);
+  const supabase = createClient();
 
   useEffect(() => {
     const fetchProfile = async () => {

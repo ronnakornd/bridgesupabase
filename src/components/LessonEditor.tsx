@@ -1,24 +1,24 @@
 "use client";
 import React, { useState, useEffect, memo } from "react";
 import { Lesson } from "@/types/course";
-import { v4 as uuidv4 } from "uuid";
 import { deleteLesson, updateLesson } from "@/api/courses";
-import MuxVideoUploader from "./video/Uploader";
-import MuxVideoPlayer from "./video/Player";
+import UploadVideo from "./video/Uploader";
+import VideoEdit from "./video/Editor";
+import AtttachmentEditor from "./AtttachmentEditor";
 
 interface LessonManagerProps {
   selectedLesson: Lesson | null;
+  course_id: string;
   fetchLessons: () => void;
 }
 
 const LessonEditor: React.FC<LessonManagerProps> = ({
   selectedLesson,
   fetchLessons,
+  course_id,
 }: LessonManagerProps) => {
   const [editLessonTitle, setEditLessonTitle] = useState<string>("");
-  const [videoUploadId, setVideoUploadId] = useState<string | null>(null);
-  const [assetId, setAssetId] = useState<string | null>(null);
-  const [videoPlaybackId, setVideoPlaybackId] = useState<string | null>(null);
+  const [videoId, setVideoId] = useState<string | null>(null);
 
   const handleEditLesson = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -30,66 +30,18 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
     }
     const editedLesson = {
       title: editLessonTitle,
-      asset_id: assetId,
-      playback_id: videoPlaybackId,
     };
     updateLesson(selectedLesson.id, editedLesson).then(() => {
       fetchLessons();
     });
   };
 
-  const handleDeleteVideo = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-    fetch("/api/mux/", {
-      method: "DELETE",
-      body: JSON.stringify({
-        asset_id: selectedLesson?.asset_id,
-      }),
-    }).then(() => {
-      if (selectedLesson) {
-        updateLesson(selectedLesson.id, {
-          asset_id: null,
-          playback_id: null,
-        }).then(() => {
-          fetchLessons();
-        });
-      }
-    });
-    (document.getElementById("delete_video_modal") as HTMLDialogElement)?.close();
-  };
 
-  useEffect(() => {
-    if (videoUploadId && selectedLesson) {
-      fetch("/api/mux/getAssetId/" + videoUploadId)
-        .then(async (response) => {
-          const data = await response.json();
-          return data;
-        })
-        .then((data) => {
-          setAssetId(data.asset_id);
-          setVideoPlaybackId(data.playback_id);
-          const editedLesson = {
-            asset_id: data.asset_id,
-            playback_id: data.playback_id,
-          };
-          updateLesson(selectedLesson.id, editedLesson).then(() => {
-            fetchLessons();
-          });
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
-  }, [videoUploadId]);
 
   useEffect(() => {
     if (selectedLesson) {
       setEditLessonTitle(selectedLesson.title);
-      setAssetId(selectedLesson?.asset_id);
-      setVideoPlaybackId(selectedLesson?.playback_id);
+      setVideoId(selectedLesson.video_id);
     }
   }, [selectedLesson]);
 
@@ -106,7 +58,7 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
       <div>
         <div className="flex flex-col gap-4">
           <div>
-            <label className="block mb-2">Lesson Title</label>
+            <label className="block mb-2 font-semibold">Lesson Title</label>
             <input
               type="text"
               placeholder="Chapter Title"
@@ -116,50 +68,19 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
             />
           </div>
           <div>
-            <label className="block mb-2">Video</label>
-            {videoPlaybackId && (
-              <div>
-                <MuxVideoPlayer playbackId={videoPlaybackId} />
-                <div
-                  className="btn btn-neutral mt-4"
-                  onClick={() =>
-                    (document.getElementById("delete_video_modal") as HTMLDialogElement)?.show()
-                  }
-                >
-                  upload new video
-                </div>
-              </div>
+            <label className="block mb-2 font-semibold">Video</label>
+            {videoId && (
+            <VideoEdit video_id={selectedLesson?.video_id??""} lesson={selectedLesson} fetchLessons={fetchLessons}/>
             )}
-            {!videoPlaybackId && (
-              <MuxVideoUploader
-                onSuccess={setVideoUploadId}
-                onUrlGenerated={(url) => console.log({ uploadUrl: url })}
-              />
+            {!videoId && (
+            <UploadVideo lesson_id={selectedLesson?.id} course_id={course_id} fetchLessons={fetchLessons} />
             )}
           </div>
           <div>
-            <label className="block mb-2">Attachments</label>
-            <input
-              type="file"
-              accept="image/*,application/pdf"
-              multiple
-              className="file-input file-input-bordered w-full"
-              onChange={(e) => {
-                const files = e.target.files;
-                if (files) {
-                  const attachments = Array.from(files).map((file) => ({
-                    id: uuidv4(),
-                    name: file.name,
-                    type: file.type,
-                    file,
-                  }));
-                  console.log({ attachments });
-                }
-              }}
-            />
+           <AtttachmentEditor lesson_id={selectedLesson.id} />
           </div>
           <div className="modal-action">
-            <button className="btn btn-primary" onClick={handleEditLesson}>
+            <button className="btn btn-neutral w-full capitalize" onClick={handleEditLesson}>
               submit
             </button>
           </div>
@@ -203,38 +124,7 @@ const LessonEditor: React.FC<LessonManagerProps> = ({
         </div>
       </dialog>
 
-      <dialog id="delete_video_modal" className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">Confirm Delete</h3>
-          {selectedLesson && (
-            <>
-              <p className="py-4">
-                Are you sure you want to delete the current video of &quot;
-                {selectedLesson.title}&quot;?
-              </p>
-              <div className="modal-action">
-                <button
-                  className="btn btn-error"
-                  onClick={(e) => {
-                    handleDeleteVideo(e);
-                  }}
-                >
-                  Delete
-                </button>
-                <button
-                  className="btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    (document.getElementById("delete_lesson_modal") as HTMLDialogElement)?.close();
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </dialog>
+  
     </div>
   );
 };

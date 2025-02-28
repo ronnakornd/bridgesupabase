@@ -85,18 +85,22 @@ const CourseGallery: React.FC<CourseGalleryProps> = ({ courses }) => {
         {filteredCourses.map((course) => (
           <div key={course.id} className="card bg-base-100 shadow-xl">
             <figure>
-              <img src={course.cover ?? ""} alt={course.title} className="w-full h-48 object-cover" />
+              <img src={course.cover ?? ""} alt={course.title} className="w-full object-cover" style={{height: '200px'}}/>
             </figure>
             <div className="card-body">
-              <h2 className="card-title font-opunsemibold">{course.title}</h2>
-              <p>{course.description}</p>
-              <p>
+              <h2 className="card-title font-opunsemibold" style={{height: '20px'}}>{course.title}</h2>
+                <div className="overflow-y-auto " style={{height: '100px'}}>
+                {course.description.length > 100
+                  ? `${course.description.substring(0, 100)}...`
+                  : course.description}
+                </div>
+              <p style={{height: '20px'}}>
                 <strong>Instructor:</strong> {course.instructor}
               </p>
-              <p>
+              <p style={{height: '20px'}}>
                 <strong>Price:</strong> {course.price} บาท
               </p>
-              <div className="flex gap-1">
+              <div className="flex gap-1" style={{height: '20px'}}>
                 {course.tags.map((tag) => (
                   <span key={tag} className="badge badge-neutral">
                     {tag}

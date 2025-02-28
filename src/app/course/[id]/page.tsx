@@ -1,24 +1,33 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import CourseDetail from "@/components/CourseDetail";
-import { fetchCourseById } from '@/api/courses';
+import { Course } from "@/types/course";
+import { useParams } from "next/navigation";
+import { fetchCourseById } from "@/api/courses";
 
+export default function CoursePage() {
+  const { id } = useParams();
+  const [course, setCourse] = useState<Course | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-
-
-export default async function CoursePage({
-    params,
-  }: {
-    params: Promise<{ id: string }>
-  }) {
-    const id = (await params).id;
-    const course = await fetchCourseById(id);
-    if (!course) {
-      return <div>Course not found</div>;
+  const fetchCourse = async () => {
+    if (!id) {
+      return;
     }
+    const data = await fetchCourseById(id as string);
+    setCourse(data);
+    setIsLoaded(true);
+  };
 
-    return (
-        <div  className="px-10 w-full flex flex-col items-center justify-start">
-          <CourseDetail course={course} />
-        </div>
-      );
-  }
+  useEffect(() => {
+    fetchCourse();
+  }, [id]);
+
+  return (
+    <div className="px-10 min-h-screen w-full flex flex-col items-center justify-center">
+      {!isLoaded && <div>Loading...</div>}
+      {isLoaded && course && <CourseDetail course={course} />}
+      {isLoaded && !course && <div>Course not found</div>}
+    </div>
+  );
+}

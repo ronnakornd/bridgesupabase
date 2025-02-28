@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { supabase } from "@/libs/supabase/client";
+import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
 
 const Login: React.FC = () => {
@@ -11,7 +11,8 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-      const { error } = await supabase.auth.signInWithPassword({email, password});
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         setError(error.message);
         throw error;

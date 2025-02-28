@@ -56,9 +56,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
       title: newLessonTitle,
       chapter_id: chapterId as string,
       index: lessons.length,
-      attachments: [],
-      asset_id: null,
-      playback_id: null,
+      video_id: null,
     };
 
     addLesson(newLesson).then((data) => {
@@ -91,28 +89,6 @@ const LessonManager: React.FC<LessonManagerProps> = ({
     (document.getElementById("edit_lesson_modal") as HTMLDialogElement)?.close();
   };
 
-  const handleDeleteVideo = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-    fetch("/api/mux/", {
-      method: "DELETE",
-      body: JSON.stringify({
-        asset_id: selectedLesson?.asset_id,
-      }),
-    }).then(() => {
-      if (selectedLesson) {
-        updateLesson(selectedLesson.id, {
-          asset_id: null,
-          playback_id: null,
-        }).then(() => {
-          fetchLessons();
-        });
-      }
-    });
-    (document.getElementById("delete_video_modal") as HTMLDialogElement)?.close();
-  };
 
   useEffect(() => {
     fetchLessons();
@@ -179,8 +155,8 @@ const LessonManager: React.FC<LessonManagerProps> = ({
                   <div
                     onClick={(e) => {
                       e.preventDefault();
+                      e.stopPropagation();
                       setSelectedLesson(lesson);
-
                       (document
                         .getElementById("delete_lesson_modal") as HTMLDialogElement)
                         ?.showModal();
@@ -292,39 +268,6 @@ const LessonManager: React.FC<LessonManagerProps> = ({
                       fetchLessons();
                     });
                     (document.getElementById("delete_lesson_modal") as HTMLDialogElement)?.close();
-                  }}
-                >
-                  Delete
-                </button>
-                <button
-                  className="btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    (document.getElementById("delete_lesson_modal") as HTMLDialogElement)?.close();
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </dialog>
-
-      <dialog id="delete_video_modal" className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">Confirm Delete</h3>
-          {selectedLesson && (
-            <>
-              <p className="py-4">
-                Are you sure you want to delete the current video of &quot;
-                {selectedLesson.title}&quot;?
-              </p>
-              <div className="modal-action">
-                <button
-                  className="btn btn-error"
-                  onClick={(e) => {
-                    handleDeleteVideo(e);
                   }}
                 >
                   Delete

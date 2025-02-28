@@ -21,6 +21,6 @@ export default {
     require('daisyui'),
   ],
   daisyui: {
-    themes: ["cupcake", "dark", "cmyk","coffee"],
+    themes: ["cupcake","dark"],
   }
 } satisfies Config;

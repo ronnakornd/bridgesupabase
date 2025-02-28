@@ -1,9 +1,12 @@
-import { supabase } from '@/libs/supabase/client';
+import { createClient } from '@/libs/supabase/client';
 import { Course, Chapter, Lesson } from '@/types/course';
 import { PostgrestError } from '@supabase/supabase-js';
 
+
+
 // Fetch all courses
 export const fetchCourses = async (): Promise<Course[]> => {
+    const supabase =  createClient();
     const { data, error } = await supabase
         .from('courses')
         .select('*');
@@ -17,11 +20,10 @@ export const fetchCourses = async (): Promise<Course[]> => {
 
 // Fetch a single course by ID
 export const fetchCourseById = async (id: string): Promise<Course | null> => {
+    const supabase =  createClient();
     const { data, error } = await supabase
         .from('courses')
-        .select('*')
-        .eq('id', id)
-        .single();
+        .select('*').eq('id', id).single();
 
     if (error) {
         throw new Error(error.message);
@@ -30,8 +32,22 @@ export const fetchCourseById = async (id: string): Promise<Course | null> => {
     return data as Course;
 };
 
+export const fetchCourseByinstructorId = async (instructorId: string): Promise<Course[]> => {
+    const supabase =  createClient();
+    const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .contains('instructor_id', [instructorId]);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+    return data as Course[];
+}
+
 // Add a new course
 export const addCourse = async (course: Omit<Course, 'id' | 'created_at' | 'updated_at'>): Promise<{data: Course, error: PostgrestError|null}> => {
+    const supabase =  createClient();
     const {data, error } = await supabase
         .from('courses')
         .insert([
@@ -50,6 +66,7 @@ export const addCourse = async (course: Omit<Course, 'id' | 'created_at' | 'upda
 
 // Update an existing course
 export const updateCourse = async (id: string, course: Partial<Omit<Course, 'id' | 'created_at' | 'updated_at'>>): Promise<void> => {
+    const supabase =  createClient();
     const { error } = await supabase
         .from('courses')
         .update({
@@ -65,6 +82,7 @@ export const updateCourse = async (id: string, course: Partial<Omit<Course, 'id'
 
 // Delete a course
 export const deleteCourse = async (id: string): Promise<void> => {
+    const supabase =  createClient();
     const { error } = await supabase
         .from('courses')
         .delete()
@@ -77,6 +95,7 @@ export const deleteCourse = async (id: string): Promise<void> => {
 
 // Fetch all chapters of a course
 export const fetchChapters = async (courseId: string): Promise<Chapter[]> => {
+    const supabase =  createClient();
     const { data, error } = await supabase
         .from('chapters')
         .select('*')
@@ -91,6 +110,7 @@ export const fetchChapters = async (courseId: string): Promise<Chapter[]> => {
 
 // Add a new chapter
 export const addChapter = async (chapter: Omit<Chapter, 'id' | 'created_at' | 'updated_at'>): Promise<Chapter> => {
+    const supabase =  createClient();
     const { data, error } = await supabase
         .from('chapters')
         .insert([
@@ -108,6 +128,7 @@ export const addChapter = async (chapter: Omit<Chapter, 'id' | 'created_at' | 'u
 
 // Update an existing chapter
 export const updateChapter = async (id: string, chapter: Partial<Omit<Chapter, 'id' | 'created_at' | 'updated_at'>>): Promise<void> => {
+    const supabase =  createClient();
     const { error } = await supabase
         .from('chapters')
         .update({
@@ -123,6 +144,7 @@ export const updateChapter = async (id: string, chapter: Partial<Omit<Chapter, '
 
 // Delete a chapter
 export const deleteChapter = async (id: string): Promise<void> => {
+    const supabase =  createClient();
     const { error } = await supabase
         .from('chapters')
         .delete()
@@ -135,6 +157,7 @@ export const deleteChapter = async (id: string): Promise<void> => {
 
 // Fetch all lessons of a chapter
 export const fetchLessons = async (chapterId: string): Promise<Lesson[]> => {
+    const supabase =  createClient();
     const { data, error } = await supabase
         .from('lessons')
         .select('*')
@@ -149,6 +172,7 @@ export const fetchLessons = async (chapterId: string): Promise<Lesson[]> => {
 
 // Add a new lesson
 export const addLesson = async (lesson: Omit<Lesson, 'id' | 'created_at' | 'updated_at'>): Promise<Lesson> => {
+    const supabase =  createClient();
     const { data, error } = await supabase
         .from('lessons')
         .insert([
@@ -167,6 +191,8 @@ export const addLesson = async (lesson: Omit<Lesson, 'id' | 'created_at' | 'upda
 
 // Update an existing lesson
 export const updateLesson = async (id: string, lesson: Partial<Omit<Lesson, 'id' | 'created_at' | 'updated_at'>>): Promise<void> => {
+    const supabase =  createClient();
+    console.log(lesson);
     const { error } = await supabase
         .from('lessons')
         .update({
@@ -182,6 +208,7 @@ export const updateLesson = async (id: string, lesson: Partial<Omit<Lesson, 'id'
 
 // Delete a lesson
 export const deleteLesson = async (id: string): Promise<void> => {
+    const supabase =  createClient();
     const { error } = await supabase
         .from('lessons')
         .delete()
@@ -194,6 +221,7 @@ export const deleteLesson = async (id: string): Promise<void> => {
 
 // Fetch a single lesson by ID
 export const fetchLessonById = async (id: string): Promise<Lesson | null> => {
+    const supabase =  createClient();
     const { data, error } = await supabase
         .from('lessons')
         .select('*')
@@ -209,6 +237,7 @@ export const fetchLessonById = async (id: string): Promise<Lesson | null> => {
 
 // Fetch a single chapter by ID
 export const fetchChapterById = async (id: string): Promise<Chapter | null> => {
+    const supabase =  createClient();
     const { data, error } = await supabase
         .from('chapters')
         .select('*')
@@ -224,10 +253,11 @@ export const fetchChapterById = async (id: string): Promise<Chapter | null> => {
 
 // Fetch chapters by course ID
 export const fetchChaptersByCourseId = async (courseId: string): Promise<Chapter[]> => {
+    const supabase =  createClient();
     const { data, error } = await supabase
         .from('chapters')
         .select('*')
-        .eq('course_id', courseId);
+        .eq('course_id', courseId).order('index', { ascending: true });
     if (error) {
         throw new Error(error.message);
     }
@@ -237,10 +267,11 @@ export const fetchChaptersByCourseId = async (courseId: string): Promise<Chapter
 
 // Fetch lessons by chapter ID
 export const fetchLessonsByChapterId = async (chapterId: string): Promise<Lesson[]> => {
+    const supabase =  createClient();
     const { data, error } = await supabase
         .from('lessons')
         .select('*')
-        .eq('chapter_id', chapterId);
+        .eq('chapter_id', chapterId).order('index', { ascending: true });
     if (error) {
         throw new Error(error.message);
     }

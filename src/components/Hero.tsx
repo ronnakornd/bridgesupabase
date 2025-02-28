@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import HeroImage from '@/asset/Untitled design.svg';
 
 
 const Hero: React.FC = () => {
@@ -8,7 +9,7 @@ const Hero: React.FC = () => {
             <div className="hero-content flex-col lg:flex-row-reverse">
                 <div className="lg:w-1/2">
                     <Image
-                        src="images/Untitled design.svg"
+                        src={HeroImage}
                         alt="Hero"
                         width={500}
                         height={500}

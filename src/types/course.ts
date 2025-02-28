@@ -9,18 +9,10 @@ export interface Lesson {
     id: string;
     title: string;
     chapter_id: string;
-    playback_id: string | null;
-    asset_id: string | null;
-    attachments: Attachment[];
+    video_id: string | null;
     index: number;
 }
 
-export interface Attachment {
-    id: string;
-    title: string;
-    url: string;
-    type: 'video' | 'pdf' | 'image';
-}
 
 export interface Course {
     id: string;
@@ -38,3 +30,7 @@ export interface Course {
     updated_at: Date;
     chapters: string[];
 }
+
+export interface TableOfContentsChapters extends Chapter {
+    lessons: Lesson[];
+  }

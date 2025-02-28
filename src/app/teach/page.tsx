@@ -1,14 +1,17 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { fetchCourses, deleteCourse } from "@/api/courses";
+import React, {useEffect, useState } from "react";
+import { fetchCourseByinstructorId, deleteCourse } from "@/api/courses";
+import { fetchProfile } from "@/api/users";
 import { Course } from "@/types/course";
 import BadgeLevel from "@/components/BadgeLevel";
 import Link from "next/link";
+import { User } from "@/types/user";
 
 function Teach() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [user, setUser] = useState<User | null>(null);
   const [filterLevel, setFilterLevel] = useState<
     "all" | "beginner" | "intermediate" | "advanced"
   >("all");
@@ -29,13 +32,27 @@ function Teach() {
   };
 
   useEffect(() => {
-    const fetchCoursesData = async () => {
-      const data = await fetchCourses();
-      setCourses(data);
-      setIsLoaded(true);
+    const fetchProfileData = async () => {
+      const data = await fetchProfile();
+      if (data) {
+        setUser(data);
+      }
     };
-    fetchCoursesData();
+    fetchProfileData();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      const fetchCoursesData = async () => {
+        const data = await fetchCourseByinstructorId(user.id);
+        if (data) {
+          setCourses(data);
+          setIsLoaded(true);
+        }
+      };
+      fetchCoursesData();
+    }
+  }, [user]);
 
   const filteredCourses = courses.filter((course) => {
     const matchesSearch = course.title

@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect} from "react";
-import {useParams } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import { fetchCourseById, updateCourse } from "@/api/courses";
 import { uploadImage, deleteImage } from "@/api/images";
 import { Course, Chapter } from "@/types/course";
@@ -17,6 +17,10 @@ const EditCourse: React.FC = () => {
   const [description, setDescription] = useState("");
   const [instructor, setInstructor] = useState<string[]>([]);
   const [duration, setDuration] = useState(0);
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const lessonParam = searchParams.get("lesson");
+
   const [level, setLevel] = useState<"beginner" | "intermediate" | "advanced">(
     "beginner"
   );
@@ -29,6 +33,7 @@ const EditCourse: React.FC = () => {
   const [coverImgFile, setCoverImgFile] = useState<File | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [tab, setTab] = useState(0);
+  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
 
   useEffect(() => {
     const getCourse = async () => {
@@ -100,6 +105,27 @@ const EditCourse: React.FC = () => {
     }
   };
 
+  const handleTabChange = (tab: number) => {
+    setTab(tab);
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("tab", tab.toString());
+    const newRelativePathQuery =
+      window.location.pathname + "?" + searchParams.toString();
+    window.history.pushState(null, "", newRelativePathQuery);
+  };
+
+  useEffect(() => {
+    if (tabParam) {
+      setTab(Number(tabParam));
+    }
+  }, [tabParam]);
+
+  useEffect(() => {
+    if (lessonParam) {
+      setSelectedLessonId(lessonParam);
+    }
+  }, [lessonParam]);
+
   return (
     <div className="px-10 py-32 min-h-screen">
       <h1 className="text-4xl font-opunbold mb-4">Edit Course</h1>
@@ -108,21 +134,21 @@ const EditCourse: React.FC = () => {
         <a
           role="tab"
           className={`tab ${tab == 0 ? "tab-active" : ""}`}
-          onClick={() => setTab(0)}
+          onClick={() => handleTabChange(0)}
         >
           Info
         </a>
         <a
           role="tab"
           className={`tab ${tab == 1 ? "tab-active" : ""}`}
-          onClick={() => setTab(1)}
+          onClick={() => handleTabChange(1)}
         >
           Layout
         </a>
         <a
           role="tab"
           className={`tab ${tab == 2 ? "tab-active" : ""}`}
-          onClick={() => setTab(2)}
+          onClick={() => handleTabChange(2)}
         >
           Contents
         </a>
@@ -156,13 +182,11 @@ const EditCourse: React.FC = () => {
           {tab === 1 && (
             <div className="grid grid-cols-2 gap-4 bg-base-100 p-10 min-h-[70vh]">
               <ChapterManager onSelectedChapter={setSelectedChapter} />
-              <LessonManager
-                selectedChapter={selectedChapter}
-              />
+              <LessonManager selectedChapter={selectedChapter} />
             </div>
           )}
           {tab === 2 && (
-            <LessonContent courseId={course.id} courseTitle={course.title} />
+            <LessonContent courseId={course.id} courseTitle={course.title} selectedLessonId={selectedLessonId} />
           )}
         </div>
       )}

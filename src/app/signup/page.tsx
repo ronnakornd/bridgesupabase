@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "@/libs/supabase/client";
+import { createClient } from "@/libs/supabase/client";
 import { useRouter } from "next/navigation";
 
 export default function Register() {
@@ -17,6 +17,7 @@ export default function Register() {
   const [message, setMessage] = useState<string>("");
   const [messageType, setMessageType] = useState<"error" | "success">("error");
   const router = useRouter();
+  const supabase = createClient();
 
   const validateForm = () => {
     if (password !== confirmPassword) {

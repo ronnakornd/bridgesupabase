@@ -1,10 +1,10 @@
 
-import { supabase } from '@/libs/supabase/client';
+import { createClient } from '@/libs/supabase/client';
 import { User } from '@/types/user';
 
 
-
  export const fetchProfile = async (): Promise<User | null> => {
+      const supabase = createClient();
       const user = await supabase.auth.getUser();
       if (!user) {
         return null;

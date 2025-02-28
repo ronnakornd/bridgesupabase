@@ -1,12 +1,8 @@
 import React from "react";
-
-interface LinkProps {
-  name: string;
-  href?: string;
-}
+import { BreadCrumbItem } from "@/types/breadcrump";
 
 interface BreadcrumpProps {
-  directory: LinkProps[];
+  directory: BreadCrumbItem[];
 }
 
 function Breadcrump({ directory }: BreadcrumpProps) {
@@ -15,8 +11,8 @@ function Breadcrump({ directory }: BreadcrumpProps) {
       <ul>
        {directory.map((link, index) => (
           <li key={index}>
-            <a href={link.href}>{link.name}</a>
-            </li>
+            <a className={`${index == directory.length-1? 'font-semibold':''}`} href={link.href}>{link.name}</a>
+          </li>
         ))}
       </ul>
     </div>

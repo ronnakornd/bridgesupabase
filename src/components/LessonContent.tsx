@@ -4,20 +4,20 @@ import {
   fetchChaptersByCourseId,
   fetchLessonsByChapterId,
 } from "@/api/courses";
-import { Chapter, Lesson } from "@/types/course";
+import {Lesson, TableOfContentsChapters } from "@/types/course";
 import LessonEditor from "./LessonEditor";
-
 
 interface LessonContentProps {
   courseId: string;
   courseTitle: string;
+  selectedLessonId: string | null;
 }
 
-interface TableOfContentsChapters extends Chapter {
-  lessons: Lesson[];
-}
-
-function LessonContent({ courseId, courseTitle }: LessonContentProps) {
+function LessonContent({
+  courseId,
+  courseTitle,
+  selectedLessonId,
+}: LessonContentProps) {
   const [chapters, setChapters] = useState<TableOfContentsChapters[]>([]);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
 
@@ -30,20 +30,42 @@ function LessonContent({ courseId, courseTitle }: LessonContentProps) {
       })
     );
     setChapters(chaptersWithLessons);
-    if(selectedLesson) {
-      setSelectedLesson(chaptersWithLessons.flatMap(chapter => chapter.lessons).find(lesson => lesson.id === selectedLesson.id) || null);
+    if (selectedLesson) {
+      setSelectedLesson(
+        chaptersWithLessons
+          .flatMap((chapter) => chapter.lessons)
+          .find((lesson) => lesson.id === selectedLesson.id) || null
+      );
       alert("update successfully");
     }
+  };
+
+  const handleLessonSelect = (lesson: Lesson) => {
+    setSelectedLesson(lesson);
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("lesson", lesson.id);
+    const newRelativePathQuery =
+      window.location.pathname + "?" + searchParams.toString();
+    window.history.pushState(null, "", newRelativePathQuery);
   };
 
   useEffect(() => {
     fetchChapters();
   }, []);
 
+  useEffect(() => {
+    if (selectedLessonId && chapters.length > 0) {
+      const lesson = chapters
+        .flatMap((chapter) => chapter.lessons)
+        .find((lesson) => lesson.id === selectedLessonId);
+      setSelectedLesson(lesson || null);
+    }
+  }, [chapters, selectedLessonId]);
+
   return (
     <div className="grid grid-cols-3 gap-4 p-5 min-h-[70vh]">
       <div className="col-span-1">
-        <h2 className="text-3xl font-opunbold m-5">{courseTitle}</h2>
+        <h2 className="text-2xl font-opunbold m-5">{courseTitle}</h2>
         <ul className="menu bg-base-200 rounded-box w-full">
           {chapters.map((chapter) => (
             <li key={chapter.id} className="menu-title">
@@ -51,28 +73,28 @@ function LessonContent({ courseId, courseTitle }: LessonContentProps) {
               {chapter.lessons.length == 0 && (
                 <ul>
                   <li>
-                    <a className="text-stone-400">
-                      No lessons available
-                    </a>
+                    <a className="text-stone-400">No lessons available</a>
                   </li>
                 </ul>
               )}
               {chapter.lessons && (
                 <ul>
                   {chapter.lessons
-                  .sort((a, b) => a.index - b.index)
-                  .map((lesson) => (
-                    <li key={lesson.id}>
-                    <a
-                      className={`${
-                      selectedLesson?.id == lesson.id ? "bg-stone-300" : ""
-                      }`}
-                      onClick={() => setSelectedLesson(lesson)}
-                    >
-                      {lesson.title}
-                    </a>
-                    </li>
-                  ))}
+                    .sort((a, b) => a.index - b.index)
+                    .map((lesson) => (
+                      <li key={lesson.id}>
+                        <a
+                          className={`${
+                            selectedLesson?.id == lesson.id
+                              ? "bg-stone-300"
+                              : ""
+                          }`}
+                          onClick={() => handleLessonSelect(lesson)}
+                        >
+                          {lesson.title}
+                        </a>
+                      </li>
+                    ))}
                 </ul>
               )}
             </li>
@@ -80,7 +102,11 @@ function LessonContent({ courseId, courseTitle }: LessonContentProps) {
         </ul>
       </div>
       <div className="col-span-2">
-        <LessonEditor selectedLesson={selectedLesson} fetchLessons={fetchChapters} />
+        <LessonEditor
+          selectedLesson={selectedLesson}
+          fetchLessons={fetchChapters}
+          course_id={courseId}
+        />
       </div>
     </div>
   );
