@@ -11,4 +11,5 @@ export interface User {
     createdAt: Date;
     updatedAt: Date;
     profile_image: string;
+    stripe_customer_id: string;
 }

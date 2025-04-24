@@ -192,7 +192,7 @@ const LessonManager: React.FC<LessonManagerProps> = ({
 
       <dialog id="add_lesson_modal" className="modal">
         <div className="modal-box">
-          <h3 className="font-bold text-lg">Add Chapter</h3>
+          <h3 className="font-bold text-lg">Add Lesson</h3>
           <div>
             <label className="block mb-2">Lesson Title</label>
             <input
@@ -222,9 +222,9 @@ const LessonManager: React.FC<LessonManagerProps> = ({
 
       <dialog id="edit_lesson_modal" className="modal">
         <div className="modal-box">
-          <h3 className="font-bold text-lg">Edit Chapter</h3>
+          <h3 className="font-bold text-lg">Edit Lesson</h3>
           <div>
-            <label className="block mb-2">Chapter Title</label>
+            <label className="block mb-2">Lesson Title</label>
             <input
               type="text"
               placeholder="Chapter Title"

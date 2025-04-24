@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { addCourse } from "@/api/courses";
+import { addCourse, updateCourse } from "@/api/courses";
+import { createProduct } from "@/api/stripe";
 import { Course } from "@/types/course";
 import { fetchProfile } from "@/api/users";
 import { uploadImage } from "@/api/images";
@@ -40,6 +41,7 @@ const CreateCourse: React.FC = () => {
       description,
       instructor: [instructor],
       instructor_id: [instructor_id],
+      student_id: [],
       duration,
       level,
       subject,
@@ -47,14 +49,25 @@ const CreateCourse: React.FC = () => {
       price,
       cover: coverUrl || "",
       chapters: [],
+      stripe_product_id: "",
+      stripe_price_id: "",
     };
     try {
-      const {data} = await addCourse(newCourse);
+      const { data } = await addCourse(newCourse);
+      const { data: productData } = await createProduct(data);
+
+      if (data && productData) {
+        await updateCourse(data.id, {
+          stripe_product_id: productData.id,
+          stripe_price_id: productData.default_price,
+        });
+      }
+
       alert("Course created successfully");
       console.log(data);
       window.location.href = "/course/" + data.id;
     } catch (error) {
-      alert("Failed to create course"+error);
+      alert("Failed to create course" + error);
     }
   };
 

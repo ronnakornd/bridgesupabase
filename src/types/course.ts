@@ -21,6 +21,7 @@ export interface Course {
     description: string;
     instructor: string[];
     instructor_id: string[];
+    student_id: string[];
     duration: number; // duration in minutes
     level: 'beginner' | 'intermediate' | 'advanced';
     subject: 'math' | 'science' | 'language' | 'social'| 'coding' | 'other';
@@ -29,6 +30,8 @@ export interface Course {
     created_at: Date;
     updated_at: Date;
     chapters: string[];
+    stripe_product_id?: string;
+    stripe_price_id?: string;
 }
 
 export interface TableOfContentsChapters extends Chapter {

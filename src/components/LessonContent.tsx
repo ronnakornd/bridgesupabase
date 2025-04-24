@@ -69,7 +69,7 @@ function LessonContent({
         <ul className="menu bg-base-200 rounded-box w-full">
           {chapters.map((chapter) => (
             <li key={chapter.id} className="menu-title">
-              <h1 className="font-opunsemibold capitalize">{chapter.title}</h1>
+              <h1 className="font-opunsemibold capitalize h-auto flex flex-wrap">{chapter.title}</h1>
               {chapter.lessons.length == 0 && (
                 <ul>
                   <li>
@@ -82,9 +82,9 @@ function LessonContent({
                   {chapter.lessons
                     .sort((a, b) => a.index - b.index)
                     .map((lesson) => (
-                      <li key={lesson.id}>
+                      <li key={lesson.id} >
                         <a
-                          className={`${
+                          className={`whitespace-break-spaces border-b-2 text-xs border-b-stone-300 rounded-none ${
                             selectedLesson?.id == lesson.id
                               ? "bg-stone-300"
                               : ""

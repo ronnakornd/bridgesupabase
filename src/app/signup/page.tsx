@@ -71,6 +71,7 @@ export default function Register() {
     // Step 3: Update user profile
     const { error: profileError } = await supabase.from("users").insert({
       id: data?.user?.id,
+      email: email,
       first_name: firstName,
       last_name: lastName,
       role:role,

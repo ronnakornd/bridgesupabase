@@ -1,11 +1,14 @@
 "use client";
-import React, {useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchCourseByinstructorId, deleteCourse } from "@/api/courses";
 import { fetchProfile } from "@/api/users";
 import { Course } from "@/types/course";
 import BadgeLevel from "@/components/BadgeLevel";
 import Link from "next/link";
 import { User } from "@/types/user";
+import { UsersRound } from "lucide-react";
+import Pagination from "@/components/Pagination";
+import { createProduct } from "@/api/stripe";
 
 function Teach() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -19,6 +22,9 @@ function Teach() {
     "all" | "math" | "science" | "language" | "social" | "coding" | "other"
   >("all");
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 3;
 
   const handleDeleteCourse = async (id: string) => {
     try {
@@ -64,6 +70,10 @@ function Teach() {
 
     return matchesSearch && matchesLevel && matchesSubject;
   });
+
+  useEffect(() => {
+    setTotalPages(Math.ceil(filteredCourses.length / itemsPerPage));
+  }, [filteredCourses, itemsPerPage]);
 
   return (
     <div className="py-40 px-40 bg-base-200 min-h-screen">
@@ -132,41 +142,69 @@ function Teach() {
         </div>
       </div>
       <ul className="flex flex-col gap-4">
-        {filteredCourses.map((course) => (
-          <li
-            className="p-6 bg-white rounded-md flex justify-between items-center hover:bg-base-300"
-            key={course.id}
-          >
-            <div className="text-opun text-xl">
-              <p className="font-opunsemibold mb-3">{course.title}</p>
-              <div className="flex gap-2">
-                <p className="badge badge-neutral">{course.subject}</p>
-                <BadgeLevel level={course.level} />
+        {filteredCourses
+          .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+          .map((course) => (
+            <li
+              className="p-6 bg-white rounded-md flex justify-between items-center hover:bg-base-300"
+              key={course.id}
+            >
+              <div className="text-opun text-xl">
+                <p className="font-opunsemibold mb-3">{course.title}</p>
+                <div className="flex gap-2">
+                  <p className="badge badge-neutral">{course.subject}</p>
+                  <BadgeLevel level={course.level} />
+                </div>
               </div>
-            </div>
-            <div className="flex gap-2">
-              <a href={`/course/${course.id}`} className="btn btn-outline">
-                View
-              </a>
-              <a href={`/course/edit/${course.id}`} className="btn btn-primary">
-                Edit
-              </a>
-              <button
-                className="btn btn-error"
-                onClick={async () => {
-                  setSelectedCourse(course);
-                  const modal = document.getElementById("delete_modal");
-                  if (modal) {
-                    (modal as HTMLDialogElement).showModal();
-                  }
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
+              <div className="flex gap-2">
+                <Link href={`/course/${course.id}`} className="btn btn-outline">
+                  View
+                </Link>
+                <Link
+                  href={`/course/edit/${course.id}`}
+                  className="btn btn-primary"
+                >
+                  Edit
+                </Link>
+                <button
+                  className="btn btn-neutral"
+                  onClick={async () => {
+                    await createProduct(course);
+                  }}
+                >
+                  Create Product
+                </button>
+                <Link
+                  href={`/course/edit/${course.id}/student`}
+                  className="btn btn-neutral"
+                >
+                  <UsersRound size={24} />
+                </Link>
+
+                <button
+                  className="btn btn-error"
+                  onClick={async () => {
+                    setSelectedCourse(course);
+                    const modal = document.getElementById("delete_modal");
+                    if (modal) {
+                      (modal as HTMLDialogElement).showModal();
+                    }
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
       </ul>
+
+      <div className="flex justify-center mt-10">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={(page) => setCurrentPage(page)}
+        />
+      </div>
 
       {isLoaded && filteredCourses.length === 0 && (
         <p className="text-center mt-10">No courses found.</p>

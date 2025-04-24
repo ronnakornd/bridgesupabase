@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { Course } from "@/types/course";
-
+import Pagination from "./Pagination";
 interface CourseGalleryProps {
   courses: Course[];
 }
@@ -14,6 +15,9 @@ const CourseGallery: React.FC<CourseGalleryProps> = ({ courses }) => {
   const [filterSubject, setFilterSubject] = useState<
     "all" | "math" | "science" | "language" | "social" | "coding" | "other"
   >("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 6;
 
   const filteredCourses = courses.filter((course) => {
     const matchesSearch = course.title
@@ -25,6 +29,11 @@ const CourseGallery: React.FC<CourseGalleryProps> = ({ courses }) => {
 
     return matchesSearch && matchesLevel && matchesSubject;
   });
+
+  useEffect(() => {
+    const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
+    setTotalPages(totalPages);
+  }, [filteredCourses, itemsPerPage]);
 
   return (
     <div className="p-4">
@@ -82,37 +91,62 @@ const CourseGallery: React.FC<CourseGalleryProps> = ({ courses }) => {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-[80vw] pb-10">
-        {filteredCourses.map((course) => (
-          <div key={course.id} className="card bg-base-100 shadow-xl">
-            <figure>
-              <img src={course.cover ?? ""} alt={course.title} className="w-full object-cover" style={{height: '200px'}}/>
-            </figure>
-            <div className="card-body">
-              <h2 className="card-title font-opunsemibold" style={{height: '20px'}}>{course.title}</h2>
-                <div className="overflow-y-auto " style={{height: '100px'}}>
-                {course.description.length > 100
-                  ? `${course.description.substring(0, 100)}...`
-                  : course.description}
+        {filteredCourses
+          .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+          .map((course) => (
+            <div key={course.id} className="card bg-base-100 shadow-xl">
+              <figure>
+                <Image
+                  src={course.cover ?? ""}
+                  alt={course.title}
+                  width={100}
+                  height={100}
+                  className="w-full h-40 object-cover"
+                />
+              </figure>
+              <div className="card-body">
+                <h2
+                  className="card-title font-opunsemibold"
+                  style={{ height: "20px" }}
+                >
+                  {course.title}
+                </h2>
+                <div className="overflow-y-auto " style={{ height: "100px" }}>
+                  {course.description.length > 100
+                    ? `${course.description.substring(0, 100)}...`
+                    : course.description}
                 </div>
-              <p style={{height: '20px'}}>
-                <strong>Instructor:</strong> {course.instructor}
-              </p>
-              <p style={{height: '20px'}}>
-                <strong>Price:</strong> {course.price} บาท
-              </p>
-              <div className="flex gap-1" style={{height: '20px'}}>
-                {course.tags.map((tag) => (
-                  <span key={tag} className="badge badge-neutral">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <div className="card-actions justify-end">
-                <a href={`/course/${course.id}`} className="btn btn-secondary">View</a>
+                <p style={{ height: "20px" }}>
+                  <strong>Instructor:</strong> {course.instructor}
+                </p>
+                <p style={{ height: "20px" }}>
+                  <strong>Price:</strong> {course.price} บาท
+                </p>
+                <div className="flex gap-1" style={{ height: "20px" }}>
+                  {course.tags.map((tag) => (
+                    <span key={tag} className="badge badge-neutral">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="card-actions justify-end">
+                  <a
+                    href={`/course/${course.id}`}
+                    className="btn btn-secondary"
+                  >
+                    View
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+      </div>
+      <div className="flex justify-center items-center p-5">
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={(page) => setCurrentPage(page)}
+      />
       </div>
     </div>
   );

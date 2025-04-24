@@ -1,27 +1,28 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import CourseDetail from "@/components/CourseDetail";
 import { Course } from "@/types/course";
 import { useParams } from "next/navigation";
 import { fetchCourseById } from "@/api/courses";
 
 export default function CoursePage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id as string;
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const fetchCourse = async () => {
+  const fetchCourse = useCallback(async () => {
     if (!id) {
       return;
     }
     const data = await fetchCourseById(id as string);
     setCourse(data);
     setIsLoaded(true);
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchCourse();
-  }, [id]);
+  }, [fetchCourse]);
 
   return (
     <div className="px-10 min-h-screen w-full flex flex-col items-center justify-center">
